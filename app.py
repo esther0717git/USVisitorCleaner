@@ -12,7 +12,7 @@ st.set_page_config(page_title="Visitor List Cleaner (US)", layout="wide")
 st.title("🇺🇸 CLARITY GATE - US VISITOR DATA CLEANING & VALIDATION")
 
 # ───── Download Sample Template ───────────────────────────────────────────────
-with open("us_template_10cols.xlsx", "rb") as f:
+with open("us_template.xlsx", "rb") as f:
     st.download_button(
         label="📎 Download US Sample Template",
         data=f,
