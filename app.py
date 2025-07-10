@@ -16,7 +16,7 @@ with open("us_template.xlsx", "rb") as f:
     st.download_button(
         label="📎 Download US Sample Template",
         data=f,
-        file_name="us_template_10cols.xlsx",
+        file_name="us_template.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
