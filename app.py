@@ -122,6 +122,9 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
     # 9) Normalize gender
     df["Gender"] = df["Gender"].apply(clean_gender)
 
+    # 10) Truncate Driver License Number to last 4 characters
+    df["Driver License Number"] = df["Driver License Number"].astype(str).str.strip().str[-4:]
+
     return df
 
 # ───── Build & style the single-sheet Excel ──────────────────────────────────
