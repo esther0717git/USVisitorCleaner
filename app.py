@@ -43,7 +43,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
+#uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
 
 
 
