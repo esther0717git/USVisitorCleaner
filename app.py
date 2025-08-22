@@ -92,8 +92,8 @@ def fix_mobile(x):
 # ───── Core Cleaning Logic ────────────────────────────────────────────────────
 
 def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
-    # 1) Trim to exactly 10 cols then rename
-    df = df.iloc[:, :10]
+    # 1) Trim to exactly 11 cols then rename
+    df = df.iloc[:, :11]
     df.columns = [
         "S/N",
         "Vehicle Plate Number",
@@ -105,6 +105,7 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
         "Nationality (Country Name)",
         "Gender",
         "Mobile Number",
+        "Remarks", 
     ]
 
     # 2) Drop rows where all of Full Name → Mobile are blank
@@ -159,8 +160,6 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
     # 9) Normalize gender
     df["Gender"] = df["Gender"].apply(clean_gender)
 
-    # 10) Truncate Driver License Number to last 4 characters
-    #df["Driver License Number"] = df["Driver License Number"].astype(str).str.strip().str[-4:]
 
     # 10) Driver License Number: remove spaces, keep last 4 chars
     df["Driver License Number"] = (
