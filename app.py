@@ -7,18 +7,63 @@ from zoneinfo import ZoneInfo
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from openpyxl.utils import get_column_letter
 
+
+# ───── 1) Info Banner ──────────────────────────────────────────────────────────
+st.info(
+    """
+    **Data Integrity Is Our Foundation**  
+    At every step—from file upload to final report—we enforce strict validation to guarantee your visitor data is accurate, complete, and compliant.  
+    Maintaining integrity not only expedites gate clearance, it protects our facilities and ensures we meet all regulatory requirements.
+    """
+)
+
+# ───── 2) Why Data Integrity? ───────────────────────────────────────────────────
+with st.expander("Why is Data Integrity Important?"):
+    st.write(
+        """
+        - **Accuracy**: Correct visitor details reduce clearance delays.  
+        - **Security**: Reliable ID checks prevent unauthorized access.  
+        - **Compliance**: Audit-ready records ensure regulatory adherence.  
+        - **Efficiency**: Trustworthy data powers faster reporting and analytics.
+        """
+    )
+
+# ───── Download Sample Template ────────────────────────────────────────────────
+# This reads the Excel you committed as sample_template.xlsx in your repo root
+with open("sample_template.xlsx", "rb") as f:
+    sample_bytes = f.read()
+st.download_button(
+    label="🌟 Download Template",
+    data=sample_bytes,
+    file_name="sample_template.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+)
+
+# ───── 3) Uploader & Warning ───────────────────────────────────────────────────
+
+st.markdown(
+    """<div style='font-size:14px; font-weight:bold; color:#38761d;'>
+    Please ensure your spreadsheet has no missing or malformed fields.<br>
+    Columns E and F are not required to be filled in.
+    </div>""",
+    unsafe_allow_html=True
+)
+
+uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
+
+
 # ───── Streamlit setup ────────────────────────────────────────────────────────
 st.set_page_config(page_title="Visitor List Cleaner (US)", layout="wide")
 st.title("🇺🇸 CLARITY GATE - US VISITOR DATA CLEANING & VALIDATION 🫧")
 
 # ───── Download Sample Template ───────────────────────────────────────────────
-with open("us_template.xlsx", "rb") as f:
-    st.download_button(
-        label="📎 Download US Sample Template",
-        data=f,
-        file_name="us_template.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
+#with open("us_template.xlsx", "rb") as f:
+#    st.download_button(
+#        label="📎 Download US Sample Template",
+#        data=f,
+#        file_name="us_template.xlsx",
+#        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+#    )
 
 # ───── Helper functions ────────────────────────────────────────────────────────
 
