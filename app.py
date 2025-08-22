@@ -32,16 +32,6 @@ with st.expander("Why is Data Integrity Important?"):
         """
     )
 
-# ───── Download Sample Template ────────────────────────────────────────────────
-# This reads the Excel you committed as sample_template.xlsx in your repo root
-#with open("sample_template.xlsx", "rb") as f:
-#    sample_bytes = f.read()
-#st.download_button(
-#    label="🌟 Download Template",
-#    data=sample_bytes,
-#    file_name="sample_template.xlsx",
-#    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-#)
 
 # ───── 3) Uploader & Warning ───────────────────────────────────────────────────
 
