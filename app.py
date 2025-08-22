@@ -7,6 +7,10 @@ from zoneinfo import ZoneInfo
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from openpyxl.utils import get_column_letter
 
+# ───── Streamlit setup ────────────────────────────────────────────────────────
+st.set_page_config(page_title="Visitor List Cleaner (US)", layout="wide")
+st.title("🇺🇸 CLARITY GATE - US VISITOR DATA CLEANING & VALIDATION 🫧")
+
 
 # ───── 1) Info Banner ──────────────────────────────────────────────────────────
 st.info(
@@ -52,9 +56,7 @@ st.markdown(
 uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
 
 
-# ───── Streamlit setup ────────────────────────────────────────────────────────
-st.set_page_config(page_title="Visitor List Cleaner (US)", layout="wide")
-st.title("🇺🇸 CLARITY GATE - US VISITOR DATA CLEANING & VALIDATION 🫧")
+
 
 # ───── Download Sample Template ───────────────────────────────────────────────
 with open("us_template.xlsx", "rb") as f:
