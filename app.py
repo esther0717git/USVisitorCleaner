@@ -160,7 +160,16 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
     df["Gender"] = df["Gender"].apply(clean_gender)
 
     # 10) Truncate Driver License Number to last 4 characters
-    df["Driver License Number"] = df["Driver License Number"].astype(str).str.strip().str[-4:]
+    #df["Driver License Number"] = df["Driver License Number"].astype(str).str.strip().str[-4:]
+
+    # 10) Driver License Number: remove spaces, keep last 4 chars
+    df["Driver License Number"] = (
+    df["Driver License Number"]
+      .fillna("")                             # keep NaN as blank
+      .astype(str)
+      .str.replace(r"\s+", "", regex=True)    # remove ALL spaces
+      .str[-4:]                               # last 4 characters
+)
 
     return df
 
