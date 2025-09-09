@@ -258,3 +258,33 @@ if uploaded:
         file_name=fname,
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
+
+# ───── 5) Final Notice (always shown) ────────────────────────────────────────
+st.markdown(
+    """
+    <div style="line-height:1.2; font-size:14px;">
+      We will do our utmost to deliver your access ticket 1 day before your scheduled entry.<br>
+      Kindly ensure that approved access clearance codes are obtained before planning or commencing any work activities in the data center.<br>
+      Please be reminded to go through the Clarity Gate prior to submission, and ensure that all visitor and shipment details are complete and accurate to prevent rescheduling due to clarification.<br><br>
+      <strong>Note:</strong><br>
+      The Clarity Gate operates on the GOFAI system, which relies on explicitly programmed rules and logic.<br>
+      Although its validation accuracy can reach up to 98%, we strongly recommend that you thoroughly review all information before submission.<br>
+      Thank you for your cooperation.<br><br>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# ───── 6) Vendor Accuracy Reminder (always shown) ────────────────────────────
+st.markdown(
+    """
+    <div style="line-height:1.2; font-size:14px;">
+      <strong>Kindly remind all vendors to take the accuracy of the submitted information seriously.</strong><br>
+      Any <em>incorrect or incomplete details</em> will result in <em>rejection</em>, and the personnel will not be allowed to enter the data centre.<br>
+      <em>This requirement is non-negotiable, and strict compliance is expected.<em><br>
+      Please ensure this message is clearly conveyed to all concerned.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
