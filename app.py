@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import re
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from openpyxl.utils import get_column_letter
@@ -46,34 +46,42 @@ st.markdown(
 #uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
 
 # ───── 4) Estimate Clearance Date ───────────────────────────────────────────────
-now = datetime.now(ZoneInfo("Asia/Singapore"))
+# Use US/Eastern time for the US app
+us_tz = ZoneInfo("America/New_York")
+now = datetime.now(us_tz)
+
+# Display a friendly timestamp (e.g., Monday 16 September, 03:27PM)
 formatted_now = now.strftime("%A %d %B, %I:%M%p").lstrip("0")
-#st.markdown("### 🗓️ Estimate Clearance Date 🍍")
+st.write("**Today is (US/Eastern):**", formatted_now)
 
-
-# The Today timestamp:
-st.write("**Today is:**", formatted_now)
-
-if st.button("▶️ Earliest clearance:"):
-    if now.time() >= datetime.strptime("15:00", "%H:%M").time():
-        effective_submission_date = now.date() + timedelta(days=1)
+# Helper: compute earliest clearance with (cutoff=3PM ET, +2 working days, skip weekends)
+def compute_earliest_clearance(current_dt: datetime, cutoff_hour: int = 15, workdays: int = 2) -> datetime:
+    # If submitted after cutoff, move to next day; else use today
+    if current_dt.time() >= datetime.strptime(f"{cutoff_hour:02d}:00", "%H:%M").time():
+        effective_date = current_dt.date() + timedelta(days=1)
     else:
-        effective_submission_date = now.date()
+        effective_date = current_dt.date()
 
-    while effective_submission_date.weekday() >= 5:
-        effective_submission_date += timedelta(days=1)
+    # If that date falls on weekend, roll forward to Monday
+    while effective_date.weekday() >= 5:  # 5=Sat, 6=Sun
+        effective_date += timedelta(days=1)
 
-    working_days_count = 0
-    estimated_date = effective_submission_date
-    while working_days_count < 2:
-        estimated_date += timedelta(days=1)
-        if estimated_date.weekday() < 5:
-            working_days_count += 1
+    # Add N working days
+    days_added = 0
+    d = effective_date
+    while days_added < workdays:
+        d += timedelta(days=1)
+        if d.weekday() < 5:
+            days_added += 1
 
-    clearance_date = estimated_date
-    while clearance_date.weekday() >= 5:
-        clearance_date += timedelta(days=1)
+    # If landing day is weekend (shouldn’t happen with logic above, but keep safe)
+    while d.weekday() >= 5:
+        d += timedelta(days=1)
 
+    return d
+
+if st.button("▶️ Earliest clearance (US):"):
+    clearance_date = compute_earliest_clearance(now, cutoff_hour=15, workdays=2)
     formatted = f"{clearance_date:%A} {clearance_date.day} {clearance_date:%B}"
     st.success(f" **{formatted}**")
 
