@@ -45,7 +45,37 @@ st.markdown(
 
 #uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
 
+# ───── 4) Estimate Clearance Date ───────────────────────────────────────────────
+now = datetime.now(ZoneInfo("Asia/Singapore"))
+formatted_now = now.strftime("%A %d %B, %I:%M%p").lstrip("0")
+#st.markdown("### 🗓️ Estimate Clearance Date 🍍")
 
+
+# The Today timestamp:
+st.write("**Today is:**", formatted_now)
+
+if st.button("▶️ Earliest clearance:"):
+    if now.time() >= datetime.strptime("15:00", "%H:%M").time():
+        effective_submission_date = now.date() + timedelta(days=1)
+    else:
+        effective_submission_date = now.date()
+
+    while effective_submission_date.weekday() >= 5:
+        effective_submission_date += timedelta(days=1)
+
+    working_days_count = 0
+    estimated_date = effective_submission_date
+    while working_days_count < 2:
+        estimated_date += timedelta(days=1)
+        if estimated_date.weekday() < 5:
+            working_days_count += 1
+
+    clearance_date = estimated_date
+    while clearance_date.weekday() >= 5:
+        clearance_date += timedelta(days=1)
+
+    formatted = f"{clearance_date:%A} {clearance_date.day} {clearance_date:%B}"
+    st.success(f" **{formatted}**")
 
 
 # ───── Download Sample Template ───────────────────────────────────────────────
