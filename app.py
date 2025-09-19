@@ -40,7 +40,7 @@ st.markdown(
 # ───── Download Sample Template ───────────────────────────────────────────────
 with open("US_Template.xlsx", "rb") as f:
     st.download_button(
-        label="⭐️ Download US Template",
+        label="⬇️ Download US Template",
         data=f,
         file_name="US_Template.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
