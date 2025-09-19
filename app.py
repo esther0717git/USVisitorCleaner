@@ -20,7 +20,6 @@ st.info(
     Maintaining integrity not only expedites gate clearance, it protects our facilities and ensures we meet all regulatory requirements.  
 
     **Why is Data Integrity Important?**
-    
     **Accuracy**: Correct visitor details reduce clearance delays.  
     **Security**: Reliable ID checks prevent unauthorized access.  
     **Compliance**: Audit-ready records ensure regulatory adherence.  
