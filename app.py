@@ -9,7 +9,7 @@ from openpyxl.utils import get_column_letter
 
 # ───── Streamlit setup ────────────────────────────────────────────────────────
 st.set_page_config(page_title="Visitor List Cleaner (US)", layout="wide")
-st.title("🇺🇸 CLARITY GATE - US VISITOR DATA CLEANING & VALIDATION 🫧")
+st.title("🇺🇸 CLARITY GATE - US Visitor Data Cleaning & Validation 🫧")
 
 
 # ───── 1) Info Banner ──────────────────────────────────────────────────────────
