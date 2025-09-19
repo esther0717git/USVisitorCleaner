@@ -290,7 +290,7 @@ if uploaded:
 # ───── 5) Final Notice (always shown) ────────────────────────────────────────
 st.markdown(
     """
-    <div style="line-height:1.2; font-size:14px;">
+    <div style="line-height:1.2; font-size:16px;">
       We will do our utmost to deliver your access ticket 1 day before your scheduled entry.<br>
       Kindly ensure that approved access clearance codes are obtained before planning or commencing any work activities in the data center.<br>
       Please be reminded to go through the Clarity Gate prior to submission, and ensure that all visitor and shipment details are complete and accurate to prevent rescheduling due to clarification.<br><br>
