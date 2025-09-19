@@ -32,6 +32,18 @@ with st.expander("Why is Data Integrity Important?"):
         """
     )
 
+# ───── 3) Uploader & Warning ───────────────────────────────────────────────────
+
+st.markdown(
+    """<div style='font-size:14px; font-weight:bold; color:#38761d;'>
+    Please ensure your spreadsheet has no missing or malformed fields.<br>
+    Columns E (First Name) and Column F (Middle and Last Name) are not required to be filled in.<br>
+    </div>""",
+    unsafe_allow_html=True
+)
+
+#uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
+
 # ───── Download Sample Template ───────────────────────────────────────────────
 with open("US_Template.xlsx", "rb") as f:
     st.download_button(
@@ -40,18 +52,6 @@ with open("US_Template.xlsx", "rb") as f:
         file_name="US_Template.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
-
-# ───── 3) Uploader & Warning ───────────────────────────────────────────────────
-
-st.markdown(
-    """<div style='font-size:14px; font-weight:bold; color:#38761d;'>
-    Please ensure your spreadsheet has no missing or malformed fields.<br>
-    Columns E (First Name) and Column F (Middle and Last Name) are not required to be filled in.<br><br>
-    </div>""",
-    unsafe_allow_html=True
-)
-
-#uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
 
 # ───── 4) Estimate Clearance Date ───────────────────────────────────────────────
 us_tz = ZoneInfo("America/New_York")
