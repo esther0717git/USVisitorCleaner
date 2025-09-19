@@ -52,7 +52,7 @@ def now_in_eastern() -> datetime:
 
 now = now_in_eastern()
 formatted_now = now.strftime("%A %d %B, %I:%M%p").lstrip("0")
-st.write("**Today (US/Eastern Time):**", formatted_now)
+st.write("**Today:**", formatted_now)
 
 def next_working_day(d):
     """Return the next calendar date that is a weekday (Mon–Fri)."""
