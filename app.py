@@ -82,7 +82,7 @@ def earliest_clearance_inclusive(submit_dt: datetime, workdays: int = 2) -> date
     clearance = next_working_day(clearance)
     return clearance
 
-if st.button("▶️ Earliest clearance (US):"):
+if st.button("▶️ Earliest clearance:"):
     # Use Eastern 'now' to align with the displayed date
     clearance_date = earliest_clearance_inclusive(now, workdays=2)
     st.success(f" **{clearance_date:%A} {clearance_date.day} {clearance_date:%B}**")
