@@ -37,7 +37,7 @@ with st.expander("Why is Data Integrity Important?"):
 st.markdown(
     """<div style='font-size:14px; font-weight:bold; color:#38761d;'>
     Please ensure your spreadsheet has no missing or malformed fields.<br>
-    Columns E (First Name) and Column F (Middle and Last Name) are not required to be filled in.<br>
+    Columns E (First Name) and Column F (Middle and Last Name) are not required to be filled in.<br><br>
     </div>""",
     unsafe_allow_html=True
 )
