@@ -32,7 +32,6 @@ with st.expander("Why is Data Integrity Important?"):
         """
     )
 
-
 # ───── 3) Uploader & Warning ───────────────────────────────────────────────────
 
 st.markdown(
@@ -46,44 +45,42 @@ st.markdown(
 #uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
 
 # ───── 4) Estimate Clearance Date ───────────────────────────────────────────────
-# Use US/Eastern time for the US app
 us_tz = ZoneInfo("America/New_York")
 now = datetime.now(us_tz)
-
-# Display a friendly timestamp (e.g., Monday 16 September, 03:27PM)
 formatted_now = now.strftime("%A %d %B, %I:%M%p").lstrip("0")
 st.write("**Today is (US/Eastern):**", formatted_now)
 
-# Helper: compute earliest clearance with (cutoff=3PM ET, +2 working days, skip weekends)
-def compute_earliest_clearance(current_dt: datetime, cutoff_hour: int = 15, workdays: int = 2) -> datetime:
-    # If submitted after cutoff, move to next day; else use today
-    if current_dt.time() >= datetime.strptime(f"{cutoff_hour:02d}:00", "%H:%M").time():
-        effective_date = current_dt.date() + timedelta(days=1)
-    else:
-        effective_date = current_dt.date()
-
-    # If that date falls on weekend, roll forward to Monday
-    while effective_date.weekday() >= 5:  # 5=Sat, 6=Sun
-        effective_date += timedelta(days=1)
-
-    # Add N working days
-    days_added = 0
-    d = effective_date
-    while days_added < workdays:
-        d += timedelta(days=1)
-        if d.weekday() < 5:
-            days_added += 1
-
-    # If landing day is weekend (shouldn’t happen with logic above, but keep safe)
+def next_working_day(d):
+    """Return the next calendar date that is a weekday (Mon–Fri)."""
     while d.weekday() >= 5:
         d += timedelta(days=1)
-
     return d
 
+def earliest_clearance_inclusive(submit_dt: datetime, workdays: int = 2) -> datetime:
+    """
+    Business rule:
+    - Start counting working days from the submission calendar day itself (inclusive).
+    - If submission falls on a weekend, start from the next Monday.
+    - After counting N working days, the earliest clearance is the **next** working day.
+    """
+    # Day 1 is the submission date (roll forward if weekend)
+    d = next_working_day(submit_dt.date())
+
+    # Count remaining working days (we already counted Day 1)
+    counted = 1
+    while counted < workdays:
+        d += timedelta(days=1)
+        if d.weekday() < 5:
+            counted += 1
+
+    # Earliest clearance is the NEXT working day after the Nth working day
+    clearance = d + timedelta(days=1)
+    clearance = next_working_day(clearance)
+    return clearance
+
 if st.button("▶️ Earliest clearance (US):"):
-    clearance_date = compute_earliest_clearance(now, cutoff_hour=15, workdays=2)
-    formatted = f"{clearance_date:%A} {clearance_date.day} {clearance_date:%B}"
-    st.success(f" **{formatted}**")
+    clearance_date = earliest_clearance_inclusive(now, workdays=2)
+    st.success(f" **{clearance_date:%A} {clearance_date.day} {clearance_date:%B}**")
 
 
 # ───── Download Sample Template ───────────────────────────────────────────────
