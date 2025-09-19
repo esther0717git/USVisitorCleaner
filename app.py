@@ -32,6 +32,15 @@ with st.expander("Why is Data Integrity Important?"):
         """
     )
 
+# ───── Download Sample Template ───────────────────────────────────────────────
+with open("us_template.xlsx", "rb") as f:
+    st.download_button(
+        label="📎 Download US Template",
+        data=f,
+        file_name="us_template.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
 # ───── 3) Uploader & Warning ───────────────────────────────────────────────────
 
 st.markdown(
@@ -82,15 +91,6 @@ if st.button("▶️ Earliest clearance (US):"):
     clearance_date = earliest_clearance_inclusive(now, workdays=2)
     st.success(f" **{clearance_date:%A} {clearance_date.day} {clearance_date:%B}**")
 
-
-# ───── Download Sample Template ───────────────────────────────────────────────
-with open("us_template.xlsx", "rb") as f:
-    st.download_button(
-        label="📎 Download US Template",
-        data=f,
-        file_name="us_template.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
 
 # ───── Helper functions ────────────────────────────────────────────────────────
 
@@ -271,7 +271,7 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
     return buf
 
 # ───── Streamlit UI: Upload & Download ────────────────────────────────────────
-uploaded = st.file_uploader("📁 Upload your US-template Excel", type=["xlsx"])
+uploaded = st.file_uploader("📁 Upload File", type=["xlsx"])
 if uploaded:
     raw_df = pd.read_excel(uploaded, sheet_name="Visitor List")
     cleaned = clean_data_us(raw_df)
