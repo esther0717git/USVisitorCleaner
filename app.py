@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import re
 from io import BytesIO
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from openpyxl.utils import get_column_letter
@@ -26,7 +26,6 @@ st.info(
 )
 
 # ───── 3) Uploader & Warning ───────────────────────────────────────────────────
-
 st.markdown(
     """<div style='font-size:16px; font-weight:bold; color:#38761d;'>
     Please ensure your spreadsheet has no missing or malformed fields.<br>
@@ -45,8 +44,13 @@ with open("US_Template.xlsx", "rb") as f:
     )
 
 # ───── 4) Estimate Clearance Date ───────────────────────────────────────────────
-us_tz = ZoneInfo("America/New_York")
-now = datetime.now(us_tz)
+US_EASTERN = ZoneInfo("America/New_York")
+
+def now_in_eastern() -> datetime:
+    """Return current time converted from UTC to US/Eastern (handles DST correctly)."""
+    return datetime.now(timezone.utc).astimezone(US_EASTERN)
+
+now = now_in_eastern()
 formatted_now = now.strftime("%A %d %B, %I:%M%p").lstrip("0")
 st.write("**Today (US/Eastern Time):**", formatted_now)
 
@@ -79,13 +83,13 @@ def earliest_clearance_inclusive(submit_dt: datetime, workdays: int = 2) -> date
     return clearance
 
 if st.button("▶️ Earliest clearance (US):"):
+    # Use Eastern 'now' to align with the displayed date
     clearance_date = earliest_clearance_inclusive(now, workdays=2)
     st.success(f" **{clearance_date:%A} {clearance_date.day} {clearance_date:%B}**")
 
-#uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
+# uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
 
 # ───── Helper functions ────────────────────────────────────────────────────────
-
 def split_name(full_name):
     s = str(full_name).strip()
     if " " in s:
@@ -117,7 +121,6 @@ def fix_mobile(x):
     return d
 
 # ───── Core Cleaning Logic ────────────────────────────────────────────────────
-
 def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
     # 1) Trim to exactly 11 cols then rename
     df = df.iloc[:, :11]
@@ -132,7 +135,7 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
         "Nationality (Country Name)",
         "Gender",
         "Mobile Number",
-        "Remarks", 
+        "Remarks",
     ]
 
     # 2) Drop rows where all of Full Name → Mobile are blank
@@ -177,9 +180,7 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
 
     # 7) Proper-case & split names (in case the template didn't pre-split)
     df["Full Name"] = df["Full Name"].astype(str).str.title()
-    df[["First Name","Middle and Last Name"]] = (
-        df["Full Name"].apply(split_name)
-    )
+    df[["First Name","Middle and Last Name"]] = df["Full Name"].apply(split_name)
 
     # 8) Fix Mobile Number → 10 digits
     df["Mobile Number"] = df["Mobile Number"].apply(fix_mobile)
@@ -187,20 +188,18 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
     # 9) Normalize gender
     df["Gender"] = df["Gender"].apply(clean_gender)
 
-
     # 10) Driver License Number: remove spaces, keep last 4 chars
     df["Driver License Number"] = (
-    df["Driver License Number"]
-      .fillna("")                             # keep NaN as blank
-      .astype(str)
-      .str.replace(r"\s+", "", regex=True)    # remove ALL spaces
-      .str[-4:]                               # last 4 characters
-)
+        df["Driver License Number"]
+          .fillna("")                          # keep NaN as blank
+          .astype(str)
+          .str.replace(r"\s+", "", regex=True) # remove ALL spaces
+          .str[-4:]                            # last 4 characters
+    )
 
     return df
 
 # ───── Build & style the single-sheet Excel ──────────────────────────────────
-
 def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
     buf = BytesIO()
     with pd.ExcelWriter(buf, engine="openpyxl") as writer:
@@ -269,15 +268,15 @@ if uploaded:
     cleaned = clean_data_us(raw_df)
     out_buf = generate_visitor_only_us(cleaned)
 
-    # Build filename: CompanyName_YYYYMMDD.xlsx in US/Eastern time
-    today = datetime.now(ZoneInfo("America/New_York")).strftime("%Y%m%d")
+    # Build filename: CompanyName_YYYYMMDD.xlsx using US/Eastern date (from UTC)
+    today_eastern = now_in_eastern().strftime("%Y%m%d")
     company_cell = raw_df.iloc[0, 2]
     company = (
         str(company_cell).strip()
         if pd.notna(company_cell) and str(company_cell).strip()
         else "VisitorList"
     )
-    fname = f"{company}_{today}.xlsx"
+    fname = f"{company}_{today_eastern}.xlsx"
 
     st.download_button(
         label="📥 Download Cleaned Visitor List (US)",
@@ -302,14 +301,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 # ───── 6) Vendor Accuracy Reminder (always shown) ────────────────────────────
 st.markdown(
     """
     <div style="line-height:1.2; font-size:16px;">
       <strong>Kindly remind all vendors to take the accuracy of the submitted information seriously.</strong><br>
       Any <em>incorrect or incomplete details</em> will result in <em>rejection</em>, and the personnel will not be allowed to enter the data centre.<br>
-      <em>This requirement is non-negotiable, and strict compliance is expected.<em><br>
+      <em>This requirement is non-negotiable, and strict compliance is expected.</em><br>
       Please ensure this message is clearly conveyed to all concerned.
     </div>
     """,
