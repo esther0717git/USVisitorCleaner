@@ -28,7 +28,7 @@ st.info(
 # ───── 3) Uploader & Warning ───────────────────────────────────────────────────
 
 st.markdown(
-    """<div style='font-size:14px; font-weight:bold; color:#38761d;'>
+    """<div style='font-size:16px; font-weight:bold; color:#38761d;'>
     Please ensure your spreadsheet has no missing or malformed fields.<br>
     Columns E (First Name) and Column F (Middle and Last Name) are not required to be filled in.<br><br>
     </div>""",
