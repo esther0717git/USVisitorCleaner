@@ -50,7 +50,7 @@ with open("US_Template.xlsx", "rb") as f:
 us_tz = ZoneInfo("America/New_York")
 now = datetime.now(us_tz)
 formatted_now = now.strftime("%A %d %B, %I:%M%p").lstrip("0")
-st.write("**Today is (US/Eastern):**", formatted_now)
+st.write("**Today (US/Eastern Time):**", formatted_now)
 
 def next_working_day(d):
     """Return the next calendar date that is a weekday (Mon–Fri)."""
