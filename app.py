@@ -307,7 +307,7 @@ st.markdown(
 # ───── 6) Vendor Accuracy Reminder (always shown) ────────────────────────────
 st.markdown(
     """
-    <div style="line-height:1.2; font-size:14px;">
+    <div style="line-height:1.2; font-size:16px;">
       <strong>Kindly remind all vendors to take the accuracy of the submitted information seriously.</strong><br>
       Any <em>incorrect or incomplete details</em> will result in <em>rejection</em>, and the personnel will not be allowed to enter the data centre.<br>
       <em>This requirement is non-negotiable, and strict compliance is expected.<em><br>
