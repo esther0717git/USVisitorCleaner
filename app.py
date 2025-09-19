@@ -35,8 +35,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-#uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
-
 # ───── Download Sample Template ───────────────────────────────────────────────
 with open("US_Template.xlsx", "rb") as f:
     st.download_button(
@@ -84,6 +82,7 @@ if st.button("▶️ Earliest clearance (US):"):
     clearance_date = earliest_clearance_inclusive(now, workdays=2)
     st.success(f" **{clearance_date:%A} {clearance_date.day} {clearance_date:%B}**")
 
+#uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
 
 # ───── Helper functions ────────────────────────────────────────────────────────
 
