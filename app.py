@@ -190,12 +190,20 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
 
     # 10) Driver License Number: remove spaces, keep last 4 chars
     df["Driver License Number"] = (
-        df["Driver License Number"]
-          .fillna("")                          # keep NaN as blank
-          .astype(str)
-          .str.replace(r"\s+", "", regex=True) # remove ALL spaces
-          .str[-4:]                            # last 4 characters
+    df["Driver License Number"]
+      .fillna("")                          # handle NaN
+      .astype(str)
+      .str.replace(r"\.0$", "", regex=True)  # remove .0 endings
+      .str.replace(r"\D", "", regex=True)    # keep only digits
+      .str[-4:]                             # last 4 digits
     )
+    #df["Driver License Number"] = (
+    #    df["Driver License Number"]
+    #      .fillna("")                          # keep NaN as blank
+    #      .astype(str)
+    #      .str.replace(r"\s+", "", regex=True) # remove ALL spaces
+    #      .str[-4:]                            # last 4 characters
+    #)
 
     return df
 
