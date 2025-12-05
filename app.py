@@ -220,6 +220,8 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
         center       = Alignment("center","center")
         normal_font  = Font(name="Calibri", size=9)
         bold_font    = Font(name="Calibri", size=9, bold=True)
+        invalid_fill = PatternFill("solid", fgColor="FFC7CE")  # light red
+
 
         # 1) Apply borders, alignment, font
         for row in ws.iter_rows():
@@ -244,6 +246,16 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
         for row in ws.iter_rows():
             ws.row_dimensions[row[0].row].height = 20
 
+        # 5) Highlight invalid Driver License Number (Column G) cells
+        dl_col_idx = 7  # Column G is the 7th column
+        dl_pattern = re.compile(r"^\d{4}$")
+        
+        for row in range(2, ws.max_row + 1):  # skip header row
+            cell = ws.cell(row=row, column=dl_col_idx)
+            value = str(cell.value).strip() if cell.value is not None else ""
+            if not dl_pattern.match(value):
+                cell.fill = invalid_fill
+
         # 5) Vehicles summary
         plates = []
         for v in df["Vehicle Plate Number"].dropna():
@@ -265,6 +277,7 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
         ws[f"B{ins+1}"].value   = df["Company Full Name"].notna().sum()
         ws[f"B{ins+1}"].border  = border
         ws[f"B{ins+1}"].alignment = center
+        
 
     buf.seek(0)
     return buf
