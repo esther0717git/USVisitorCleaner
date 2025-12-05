@@ -220,7 +220,7 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
         center       = Alignment("center","center")
         normal_font  = Font(name="Calibri", size=9)
         bold_font    = Font(name="Calibri", size=9, bold=True)
-        invalid_fill = PatternFill("solid", fgColor="FFC7CE")  # light red
+        invalid_fill = PatternFill("solid", fgColor="E6B8B7")  # light red
 
 
         # 1) Apply borders, alignment, font
@@ -256,7 +256,7 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
             if not dl_pattern.match(value):
                 cell.fill = invalid_fill
 
-        # 5) Vehicles summary
+        # 6) Vehicles summary
         plates = []
         for v in df["Vehicle Plate Number"].dropna():
             plates += [x.strip() for x in str(v).split(";") if x.strip()]
@@ -270,7 +270,7 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
             ws[f"B{ins+1}"].alignment = center
             ins += 2
 
-        # 6) Total Visitors
+        # 7) Total Visitors
         ws[f"B{ins}"].value     = "Total Visitors"
         ws[f"B{ins}"].border    = border
         ws[f"B{ins}"].alignment = center
