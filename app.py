@@ -87,8 +87,6 @@ if st.button("▶️ Earliest clearance:"):
     clearance_date = earliest_clearance_inclusive(now, workdays=2)
     st.success(f" **{clearance_date:%A} {clearance_date.day} {clearance_date:%B}**")
 
-# uploaded = st.file_uploader("📁 Upload file", type=["xlsx"])
-
 # ───── Helper functions ────────────────────────────────────────────────────────
 def split_name(full_name):
     s = str(full_name).strip()
@@ -103,7 +101,7 @@ def clean_gender(g):
         return "Male"
     if v == "F":
         return "Female"
-    if v in ("MALE","FEMALE"):
+    if v in ("MALE", "FEMALE"):
         return v.title()
     return v.title()
 
@@ -152,11 +150,11 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
     }
     df["Nationality (Country Name)"] = (
         df["Nationality (Country Name)"]
-          .astype(str)
-          .str.strip()
-          .str.lower()
-          .replace(nat_map, regex=False)
-          .str.title()
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        .replace(nat_map, regex=False)
+        .str.title()
     )
 
     # 4) Sort by Company → Country → Full Name
@@ -171,16 +169,16 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
     # 6) Standardize Vehicle Plate Number
     df["Vehicle Plate Number"] = (
         df["Vehicle Plate Number"]
-          .astype(str)
-          .str.replace(r"[\/,]", ";", regex=True)
-          .str.replace(r"\s*;\s*", ";", regex=True)
-          .str.strip()
-          .replace("nan","", regex=False)
+        .astype(str)
+        .str.replace(r"[\/,]", ";", regex=True)
+        .str.replace(r"\s*;\s*", ";", regex=True)
+        .str.strip()
+        .replace("nan", "", regex=False)
     )
 
     # 7) Proper-case & split names (in case the template didn't pre-split)
     df["Full Name"] = df["Full Name"].astype(str).str.title()
-    df[["First Name","Middle and Last Name"]] = df["Full Name"].apply(split_name)
+    df[["First Name", "Middle and Last Name"]] = df["Full Name"].apply(split_name)
 
     # 8) Fix Mobile Number → 10 digits
     df["Mobile Number"] = df["Mobile Number"].apply(fix_mobile)
@@ -188,40 +186,34 @@ def clean_data_us(df: pd.DataFrame) -> pd.DataFrame:
     # 9) Normalize gender
     df["Gender"] = df["Gender"].apply(clean_gender)
 
-    # 10) Driver License Number: remove spaces, keep last 4 chars
+    # 10) Driver License Number: remove spaces, keep last 4 digits
     df["Driver License Number"] = (
-    df["Driver License Number"]
-      .fillna("")                          # handle NaN
-      .astype(str)
-      .str.replace(r"\.0$", "", regex=True)  # remove .0 endings
-      .str.replace(r"\D", "", regex=True)    # keep only digits
-      .str[-4:]                             # last 4 digits
+        df["Driver License Number"]
+        .fillna("")                           # handle NaN
+        .astype(str)
+        .str.replace(r"\.0$", "", regex=True) # remove .0 endings
+        .str.replace(r"\D", "", regex=True)   # keep only digits
+        .str[-4:]                             # last 4 digits
     )
-    #df["Driver License Number"] = (
-    #    df["Driver License Number"]
-    #      .fillna("")                          # keep NaN as blank
-    #      .astype(str)
-    #      .str.replace(r"\s+", "", regex=True) # remove ALL spaces
-    #      .str[-4:]                            # last 4 characters
-    #)
 
     return df
 
 # ───── Build & style the single-sheet Excel ──────────────────────────────────
-def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
+def generate_visitor_only_us(df: pd.DataFrame):
     buf = BytesIO()
+    has_errors = False  # track if any cell is highlighted red
+
     with pd.ExcelWriter(buf, engine="openpyxl") as writer:
         df.to_excel(writer, index=False, sheet_name="Visitor List")
         ws = writer.sheets["Visitor List"]
 
         # styling objects
         header_fill  = PatternFill("solid", fgColor="94B455")
-        border       = Border(Side("thin"),Side("thin"),Side("thin"),Side("thin"))
-        center       = Alignment("center","center")
+        border       = Border(Side("thin"), Side("thin"), Side("thin"), Side("thin"))
+        center       = Alignment("center", "center")
         normal_font  = Font(name="Calibri", size=9)
         bold_font    = Font(name="Calibri", size=9, bold=True)
         invalid_fill = PatternFill("solid", fgColor="E6B8B7")  # light red
-
 
         # 1) Apply borders, alignment, font
         for row in ws.iter_rows():
@@ -249,12 +241,13 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
         # 5) Highlight invalid Driver License Number (Column G) cells
         dl_col_idx = 7  # Column G is the 7th column
         dl_pattern = re.compile(r"^\d{4}$")
-        
-        for row in range(2, ws.max_row + 1):  # skip header row
-            cell = ws.cell(row=row, column=dl_col_idx)
+
+        for r in range(2, ws.max_row + 1):  # skip header row
+            cell = ws.cell(row=r, column=dl_col_idx)
             value = str(cell.value).strip() if cell.value is not None else ""
             if not dl_pattern.match(value):
                 cell.fill = invalid_fill
+                has_errors = True
 
         # 6) Highlight blank cells in Column F (Middle and Last Name)
         col_f_idx = 6  # Column F
@@ -263,6 +256,7 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
             value = str(cell.value).strip() if cell.value not in (None, "") else ""
             if value == "":
                 cell.fill = invalid_fill
+                has_errors = True
 
         # 7) Vehicles summary
         plates = []
@@ -278,24 +272,29 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
             ws[f"B{ins+1}"].alignment = center
             ins += 2
 
-        # 7) Total Visitors
+        # 8) Total Visitors
         ws[f"B{ins}"].value     = "Total Visitors"
         ws[f"B{ins}"].border    = border
         ws[f"B{ins}"].alignment = center
         ws[f"B{ins+1}"].value   = df["Company Full Name"].notna().sum()
         ws[f"B{ins+1}"].border  = border
         ws[f"B{ins+1}"].alignment = center
-        
 
     buf.seek(0)
-    return buf
+    return buf, has_errors
 
 # ───── Streamlit UI: Upload & Download ────────────────────────────────────────
 uploaded = st.file_uploader("📁 Upload File", type=["xlsx"])
 if uploaded:
     raw_df = pd.read_excel(uploaded, sheet_name="Visitor List")
     cleaned = clean_data_us(raw_df)
-    out_buf = generate_visitor_only_us(cleaned)
+    out_buf, has_errors = generate_visitor_only_us(cleaned)
+
+    # Status message based on validation
+    if has_errors:
+        st.error("❗ Error(s) found — please correct all red-highlighted cells before submission.")
+    else:
+        st.success("✅ Please double-check critical fields before sharing with DC team.")
 
     # Build filename: CompanyName_YYYYMMDD.xlsx using US/Eastern date (from UTC)
     today_eastern = now_in_eastern().strftime("%Y%m%d")
