@@ -256,7 +256,15 @@ def generate_visitor_only_us(df: pd.DataFrame) -> BytesIO:
             if not dl_pattern.match(value):
                 cell.fill = invalid_fill
 
-        # 6) Vehicles summary
+        # 6) Highlight blank cells in Column F (Middle and Last Name)
+        col_f_idx = 6  # Column F
+        for r in range(2, ws.max_row + 1):
+            cell = ws.cell(row=r, column=col_f_idx)
+            value = str(cell.value).strip() if cell.value not in (None, "") else ""
+            if value == "":
+                cell.fill = invalid_fill
+
+        # 7) Vehicles summary
         plates = []
         for v in df["Vehicle Plate Number"].dropna():
             plates += [x.strip() for x in str(v).split(";") if x.strip()]
